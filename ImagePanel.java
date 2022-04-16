@@ -6,6 +6,24 @@ import java.io.File;
 import java.util.Arrays;
 import java.awt.image.*;
 import java.lang.Math;
+import java.io.FileWriter;
+import java.util.PriorityQueue;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+
+class HuffmanNode {
+    int item;
+    int c;
+    HuffmanNode left;
+    HuffmanNode right;
+}
+
+class ImplementComparator implements Comparator<HuffmanNode> {
+    public int compare(HuffmanNode x, HuffmanNode y) {
+        return x.item - y.item;
+    }
+}
 
 public class ImagePanel extends JPanel {
     private static int height = 600;
@@ -14,24 +32,113 @@ public class ImagePanel extends JPanel {
     private static BufferedImage dithered = null;
     private static BufferedImage compressed = null;
     private static boolean isDithered = false;
+    public static double CompressionRatio;
+    static LinkedHashMap<Integer, Integer> huffmanCodesBinary = new LinkedHashMap<Integer, Integer>();
+
+    // final private static int[][] quantizationTable = {
+    // { 1, 1, 2, 4, 8, 16, 32, 64 },
+    // { 1, 1, 2, 4, 8, 16, 32, 64 },
+    // { 2, 2, 2, 4, 8, 16, 32, 64 },
+    // { 4, 4, 4, 4, 8, 16, 32, 64 },
+    // { 8, 8, 8, 8, 8, 16, 32, 64 },
+    // { 16, 16, 16, 16, 16, 16, 32, 64 },
+    // { 32, 32, 32, 32, 32, 32, 32, 64 },
+    // { 64, 64, 64, 64, 64, 64, 64, 64 }
+
+    // };
 
     final private static int[][] quantizationTable = {
-            { 1, 1, 2, 4, 8, 16, 32, 64 },
-            { 1, 1, 2, 4, 8, 16, 32, 64 },
-            { 2, 2, 2, 4, 8, 16, 32, 64 },
-            { 4, 4, 4, 4, 8, 16, 32, 64 },
-            { 8, 8, 8, 8, 8, 16, 32, 64 },
-            { 16, 16, 16, 16, 16, 16, 32, 64 },
+            { 1, 4, 4, 8, 16, 32, 32, 64 },
+            { 4, 4, 4, 8, 16, 32, 32, 64 },
+            { 4, 4, 4, 8, 16, 32, 32, 64 },
+            { 8, 8, 8, 8, 16, 32, 32, 64 },
+            { 16, 16, 16, 16, 16, 32, 32, 64 },
+            { 32, 32, 32, 32, 32, 32, 32, 64 },
             { 32, 32, 32, 32, 32, 32, 32, 64 },
             { 64, 64, 64, 64, 64, 64, 64, 64 }
 
     };
 
     public ImagePanel() {
-
+        // printArray(quantizationTable);
         setBorder(BorderFactory.createLineBorder(Color.black));
         setPreferredSize(new Dimension(width, height));
 
+    }
+
+    public static void printCode(HuffmanNode root, String s) {
+        if (root.left == null && root.right == null && Integer.valueOf(root.c) != null) {
+            huffmanCodesBinary.put(Integer.valueOf(root.c), Integer.valueOf(s, 2));
+            // System.out.println(root.c + ": " + s);
+            return;
+        }
+        printCode(root.left, s + "0");
+        printCode(root.right, s + "1");
+    }
+
+    public static int encodeHuffman(int[] intArray, int[] freq, int[] stream) {
+        int n = intArray.length;
+
+        PriorityQueue<HuffmanNode> q = new PriorityQueue<HuffmanNode>(n, new ImplementComparator());
+
+        for (int i = 0; i < n; i++) {
+            if (freq[i] == 0) {
+                continue;
+            }
+            HuffmanNode node = new HuffmanNode();
+
+            node.c = intArray[i];
+            node.item = freq[i];
+
+            node.left = null;
+            node.right = null;
+
+            q.add(node);
+        }
+
+        System.out.println("Finished queue");
+
+        HuffmanNode root = null;
+
+        while (q.size() > 1) {
+
+            HuffmanNode x = q.peek();
+            q.poll();
+
+            HuffmanNode y = q.peek();
+            q.poll();
+
+            HuffmanNode f = new HuffmanNode();
+
+            f.item = x.item + y.item;
+            f.c = '-';
+            f.left = x;
+            f.right = y;
+            root = f;
+
+            q.add(f);
+        }
+
+        printCode(root, "");
+
+        System.out.println("Encoding using huffman.... ");
+        int length = 0;
+        int info[] = new int[stream.length];
+        for (int i = 0; i < stream.length; i++) {
+            info[i] = huffmanCodesBinary.get(stream[i]);
+            length += Integer.toString(info[i], 2).length();
+        }
+        try {
+            FileWriter w = new FileWriter("compressedImageHuff.txt");
+            for (int i = 0; i < info.length; i++) {
+                w.write(info[i] + " ");
+            }
+            w.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return length;
     }
 
     public void repaint(File file) {
@@ -79,12 +186,13 @@ public class ImagePanel extends JPanel {
 
             width = width - (width % 8);
         }
-        int[][] redValues = new int[width][height];
-        int[][] greenValues = new int[width][height];
-        int[][] blueValues = new int[width][height];
 
-        for (int i = 0; i < blueValues.length; i++) {
-            for (int j = 0; j < blueValues[0].length; j++) {
+        int[][] redValues = new int[height][width];
+        int[][] greenValues = new int[height][width];
+        int[][] blueValues = new int[height][width];
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
                 Color color = new Color(image.getRGB(j, i));
                 redValues[i][j] = color.getRed();
                 greenValues[i][j] = color.getGreen();
@@ -96,12 +204,51 @@ public class ImagePanel extends JPanel {
         int[][] greenDCT = getDCT(greenValues);
         int[][] blueDCT = getDCT(blueValues);
         int totalBitsBefore = height * width * 8 * 3;
-        int redBitsAfter = entropyEncoding(redDCT);
-        int greenBitsAfter = entropyEncoding(greenDCT);
-        int blueBitsAfter = entropyEncoding(blueDCT);
 
-        int totalBitsAfter = redBitsAfter + greenBitsAfter + blueBitsAfter;
+        String redCompressed = entropyEncoding(redDCT);
+        String greenCompressed = entropyEncoding(greenDCT);
+        String blueCompressed = entropyEncoding(blueDCT);
+
+        String compressedString = redCompressed + greenCompressed + blueCompressed;
+
+        byte[] compressedBytes = new byte[redCompressed.getBytes().length + greenCompressed.getBytes().length
+                + blueCompressed.getBytes().length];
+        int[] stream = new int[compressedString.length()];
+
+        System.arraycopy(redCompressed.getBytes(), 0, compressedBytes, 0, redCompressed.getBytes().length);
+        System.arraycopy(greenCompressed.getBytes(), 0, compressedBytes, redCompressed.getBytes().length,
+                greenCompressed.getBytes().length);
+        System.arraycopy(blueCompressed.getBytes(), 0, compressedBytes,
+                redCompressed.getBytes().length + greenCompressed.getBytes().length,
+                blueCompressed.getBytes().length);
+
+        int intArray[] = new int[256];
+        for (int i = 0; i < 256; i++) {
+            intArray[i] = i;
+        }
+        int freq[] = new int[256];
+        for (int i = 0; i < compressedBytes.length; i++) {
+
+            freq[byteToUnsignedInt(compressedBytes[i])]++;
+            stream[i] = byteToUnsignedInt(compressedBytes[i]);
+        }
+
+        int totalBitsAfter = encodeHuffman(intArray, freq, stream);
+
+        // try {
+        //     FileWriter writer = new FileWriter("compressedImage.txt");
+        //     writer.write(compressedString);
+        //     // for (int i = 0; i < compressedBytes.length; i++) {
+        //     // writer.write(compressedBytes[i] + " ");
+        //     // }
+
+        //     writer.close();
+        // } catch (Exception e) {
+        //     System.out.println("Error writing to file");
+        // }
+
         double compressionRatio = (double) totalBitsBefore / totalBitsAfter;
+        CompressionRatio = compressionRatio;
         System.out.println("Total bits before: " + totalBitsBefore);
         System.out.println("Total bits after: " + totalBitsAfter);
         System.out.println("Compression ratio: " + compressionRatio);
@@ -142,7 +289,12 @@ public class ImagePanel extends JPanel {
 
     }
 
-    public static int entropyEncoding(int[][] matrix) {
+    // signed to unsigned
+    public static int byteToUnsignedInt(Byte b) {
+        return b & 0xFF;
+    }
+
+    public static String entropyEncoding(int[][] matrix) {
         String result = "";
 
         // int totalBitsBefore = matrix.length * matrix[0].length * 8;
@@ -155,23 +307,17 @@ public class ImagePanel extends JPanel {
                         tempArray[u][v] = matrix[u + i * 8][v + j * 8];
                     }
                 }
-                // System.out.println("input:");
-                // printArray(tempArray);
+
                 int[] zigZag = zigZagMatrix(tempArray, 8, 8);
+
                 String s = runLengthEncoding(zigZag);
-                // System.out.println("output:" + s);
-                result += s;
+
+                result += s + " ";
 
             }
         }
-        int totalBitsAfter = result.getBytes().length * 8;
 
-        return totalBitsAfter;
-        // // System.out.println("Total bits before: " + totalBitsBefore);
-        // System.out.println("Total bits after: " + totalBitsAfter);
-        // System.out.println("Compression ratio: " + (double) totalBitsBefore /
-        // (double) totalBitsAfter);
-        // System.out.println("Result " + result);
+        return result;
 
     }
 
@@ -186,14 +332,14 @@ public class ImagePanel extends JPanel {
 
             } else {
 
-                result += count + ":" + array[i] + " ";
+                result += count + "|" + array[i] + " ";
                 count = 1;
 
             }
 
         }
         result += count + "|" + array[i] + " ";
-
+        // System.out.println("Run length encoding result: " + result);
         return result;
     }
 
@@ -459,23 +605,17 @@ public class ImagePanel extends JPanel {
         int row = 0, col = 0;
         int res[] = new int[n * m];
         int count = 0;
-        // Boolean variable that will true if we
-        // need to increment 'row' value otherwise
-        // false- if increment 'col' value
+
         boolean row_inc = false;
 
-        // Print matrix of lower half zig-zag pattern
         int mn = Math.min(m, n);
         for (int len = 1; len <= mn; ++len) {
             for (int i = 0; i < len; ++i) {
-                // System.out.print(arr[row][col] + " ");
+
                 res[count++] = arr[row][col];
                 if (i + 1 == len)
                     break;
-                // If row_increment value is true
-                // increment row and decrement col
-                // else decrement row and increment
-                // col
+
                 if (row_inc) {
                     ++row;
                     --col;
@@ -488,8 +628,6 @@ public class ImagePanel extends JPanel {
             if (len == mn)
                 break;
 
-            // Update row or col value according
-            // to the last increment
             if (row_inc) {
                 ++row;
                 row_inc = false;
@@ -499,7 +637,6 @@ public class ImagePanel extends JPanel {
             }
         }
 
-        // Update the indexes of row and col variable
         if (row == 0) {
             if (col == m - 1)
                 ++row;
@@ -514,7 +651,6 @@ public class ImagePanel extends JPanel {
             row_inc = false;
         }
 
-        // Print the next half zig-zag pattern
         int MAX = Math.max(m, n) - 1;
         for (int len, diag = MAX; diag > 0; --diag) {
 
@@ -524,13 +660,11 @@ public class ImagePanel extends JPanel {
                 len = diag;
 
             for (int i = 0; i < len; ++i) {
-                // System.out.print(arr[row][col] + " ");
+
                 res[count++] = arr[row][col];
                 if (i + 1 == len)
                     break;
 
-                // Update row or col value according
-                // to the last increment
                 if (row_inc) {
                     ++row;
                     --col;
@@ -540,7 +674,6 @@ public class ImagePanel extends JPanel {
                 }
             }
 
-            // Update the indexes of row and col variable
             if (row == 0 || col == m - 1) {
                 if (col == m - 1)
                     ++row;

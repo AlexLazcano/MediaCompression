@@ -26,7 +26,7 @@ public class GraphicJFrame extends JFrame {
 	private static ImagePanel imagePanel = new ImagePanel();
 	private static JLabel imageFileLabel = new JLabel("No File Selected");
 	private static JButton selectImageFileButton = new JButton("Select file");
-	// private static JButton ditherButton = new JButton("Next");
+	private static JLabel CompressionRatioImage = new JLabel("Compression Ratio: ");
 
 	private static JButton ImageButton = new JButton("Image");
 	private static JButton SoundButton = new JButton("Sound");
@@ -96,11 +96,6 @@ public class GraphicJFrame extends JFrame {
 			}
 		});
 
-		// ditherButton.addActionListener(new ActionListener() {
-		// 	public void actionPerformed(ActionEvent e) {
-		// 		ditherButtonClicked(e);
-		// 	}
-		// });
 	}
 
 	public void addSound() {
@@ -129,23 +124,17 @@ public class GraphicJFrame extends JFrame {
 
 		getContentPane().add(imageFileLabel);
 		getContentPane().add(selectImageFileButton);
+		getContentPane().add(CompressionRatioImage);
 		getContentPane().add(imagePanel);
-		// getContentPane().add(ditherButton);
-		// ditherButton.setEnabled(false);
 		getContentPane().add(ExitButton);
 	}
 
 	public void removeImage() {
 		getContentPane().remove(imageFileLabel);
 		getContentPane().remove(selectImageFileButton);
+		getContentPane().remove(CompressionRatioImage);
 		getContentPane().remove(imagePanel);
-		// getContentPane().remove(ditherButton);
-		// ditherButton.setEnabled(false);
 	}
-
-	// public static void ditherButtonClicked(ActionEvent e) {
-	// 	imagePanel.toggleDither();
-	// }
 
 	public static void readWav(File f) {
 		try {
@@ -227,7 +216,7 @@ public class GraphicJFrame extends JFrame {
 			File file = fileChooser.getSelectedFile();
 			fileLabel.setText("File Selected: " + fileChooser.getSelectedFile().getName());
 			readWav(file);
-			
+
 			if (SoundPanel.CompressionRatio != 0) {
 				String ratio = String.format("Compression Ratio: %.2f", SoundPanel.CompressionRatio);
 				CompressionRatioSound.setText(ratio);
@@ -247,8 +236,12 @@ public class GraphicJFrame extends JFrame {
 		if (res == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			imageFileLabel.setText("File Selected: " + fileChooser.getSelectedFile().getName());
-			// ditherButton.setEnabled(true);
 			readPNG(file);
+			if (ImagePanel.CompressionRatio != 0) {
+				String ratio = String.format("Compression Ratio: %.2f", ImagePanel.CompressionRatio);
+				CompressionRatioImage.setText(ratio);
+
+			}
 			pack();
 		}
 

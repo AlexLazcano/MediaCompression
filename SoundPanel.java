@@ -243,7 +243,7 @@ public class SoundPanel extends JPanel {
 			info[i] = huffmanCodesBinary.get(stream[i]);
 		}
 		try {
-			FileWriter w = new FileWriter("output.txt");
+			FileWriter w = new FileWriter("compressedSoundFile.txt");
 			for (int i = 0; i < info.length; i++) {
 				w.write(info[i]+ " ");
 			}
