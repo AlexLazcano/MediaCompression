@@ -2,7 +2,7 @@
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import java.awt.*;
-
+import java.io.FileWriter;
 import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -24,6 +24,7 @@ class ImplementComparator implements Comparator<HuffmanNode> {
 
 public class SoundPanel extends JPanel {
 	static LinkedHashMap<Integer, String> huffmanCodes = new LinkedHashMap<Integer, String>();
+	static LinkedHashMap<Integer, Integer> huffmanCodesBinary = new LinkedHashMap<Integer, Integer>();
 	private static final Color green = new Color(0, 255, 0);
 	private static final Color red = new Color(255, 0, 0);
 	private static final int height = 500;
@@ -34,13 +35,12 @@ public class SoundPanel extends JPanel {
 	private static int numberOfChannels;
 	private static int bitsPerSample;
 	private static int numberOfFrames;
+	public static double CompressionRatio;
 
 	public static void printCode(HuffmanNode root, String s) {
 		if (root.left == null && root.right == null && Integer.valueOf(root.c) != null) {
 			huffmanCodes.put(Integer.valueOf(root.c), s);
-
-			// String formatted = String.format("%5s | %s", root.c, s);
-			// System.out.println(formatted);
+			huffmanCodesBinary.put(Integer.valueOf(root.c), Integer.valueOf(s, 2));
 
 			return;
 		}
@@ -60,7 +60,7 @@ public class SoundPanel extends JPanel {
 		bitsPerSample = bitsPSample;
 		numberOfFrames = numFrames;
 
-		// repaint();
+		repaint();
 		compressBytes();
 	}
 
@@ -150,23 +150,19 @@ public class SoundPanel extends JPanel {
 			intArray[i] = num;
 			freq[num]++;
 		}
-		System.out.println("Input: ");
-		// printArray(intArray);
-		System.out.println("Frequency: ");
-		printArray(freq);
 
 		int[] intArrayNoDups = new int[256];
 		for (int i = 0; i < intArrayNoDups.length; i++) {
 			intArrayNoDups[i] = i;
 		}
-		// String s = encodeHuffman(intArrayNoDups, freq, intArray);
-		// System.out.println("Output encoding: " + s);
+
 		int numberOfBits = audioBytes.length * 8;
 		int numberOfBitsEncoded = encodeHuffman(intArrayNoDups, freq, intArray);
 
 		System.out.println("Number of bits before encoded: " + numberOfBits);
 		System.out.println("Number of bits encoded: " + numberOfBitsEncoded);
-		double compressionRatio = (double) numberOfBitsEncoded / (double) numberOfBits;
+		double compressionRatio = (double) numberOfBits / (double) numberOfBitsEncoded;
+		CompressionRatio = compressionRatio;
 		System.out.println("Compression ratio: " + compressionRatio);
 	}
 
@@ -204,15 +200,15 @@ public class SoundPanel extends JPanel {
 		PriorityQueue<HuffmanNode> q = new PriorityQueue<HuffmanNode>(n, new ImplementComparator());
 
 		for (int i = 0; i < n; i++) {
-			HuffmanNode hn = new HuffmanNode();
+			HuffmanNode node = new HuffmanNode();
 
-			hn.c = intArray[i];
-			hn.item = freq[i];
+			node.c = intArray[i];
+			node.item = freq[i];
 
-			hn.left = null;
-			hn.right = null;
+			node.left = null;
+			node.right = null;
 
-			q.add(hn);
+			q.add(node);
 		}
 
 		System.out.println("Finished queue");
@@ -236,18 +232,32 @@ public class SoundPanel extends JPanel {
 
 			q.add(f);
 		}
-		System.out.println("Int | Huffman code ");
-		System.out.println("--------------------");
 
 		printCode(root, "");
 
 		// String output = "";
 		System.out.println("Encoding using huffman.... ");
 		int length = 0;
+		int info[] = new int[stream.length];
+		for (int i = 0; i < stream.length; i++) {
+			info[i] = huffmanCodesBinary.get(stream[i]);
+		}
+		try {
+			FileWriter w = new FileWriter("output.txt");
+			for (int i = 0; i < info.length; i++) {
+				w.write(info[i]+ " ");
+			}
+			w.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+
 		for (int i = 0; i < stream.length; i++) {
 			length += huffmanCodes.get(stream[i]).length();
 			// output = output + huffmanCodes.get(stream[i]) + " ";
 		}
+
 		// System.out.println("Length of output: " + length);
 		// System.out.println("done encoding");
 		return length;

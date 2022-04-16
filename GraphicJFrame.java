@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 
-
 public class GraphicJFrame extends JFrame {
 	// sound
 	private static SoundPanel audioPanel = new SoundPanel();
@@ -22,11 +21,12 @@ public class GraphicJFrame extends JFrame {
 	private static JLabel samplingRateLabel = new JLabel("Sampling Rate: ");
 	private static JLabel totalSamplesLabel = new JLabel("Total Samples: ");
 	private static JLabel legend = new JLabel("Left - Green | Right - Red | Mono - Black");
+	private static JLabel CompressionRatioSound = new JLabel("Compression Ratio: ");
 	// image
 	private static ImagePanel imagePanel = new ImagePanel();
 	private static JLabel imageFileLabel = new JLabel("No File Selected");
 	private static JButton selectImageFileButton = new JButton("Select file");
-	private static JButton ditherButton = new JButton("Next");
+	// private static JButton ditherButton = new JButton("Next");
 
 	private static JButton ImageButton = new JButton("Image");
 	private static JButton SoundButton = new JButton("Sound");
@@ -44,11 +44,11 @@ public class GraphicJFrame extends JFrame {
 
 		// setLayout(new FlowLayout());
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-	
+
 		getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		getContentPane().add(ImageButton);
 		getContentPane().add(SoundButton);
-		
+
 		// pack();
 
 		ImageButton.addActionListener(new ActionListener() {
@@ -96,11 +96,11 @@ public class GraphicJFrame extends JFrame {
 			}
 		});
 
-		ditherButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ditherButtonClicked(e);
-			}
-		});
+		// ditherButton.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(ActionEvent e) {
+		// 		ditherButtonClicked(e);
+		// 	}
+		// });
 	}
 
 	public void addSound() {
@@ -109,6 +109,7 @@ public class GraphicJFrame extends JFrame {
 		getContentPane().add(samplingRateLabel);
 		getContentPane().add(totalSamplesLabel);
 		getContentPane().add(legend);
+		getContentPane().add(CompressionRatioSound);
 		getContentPane().add(audioPanel);
 		getContentPane().add(ExitButton);
 	}
@@ -120,6 +121,7 @@ public class GraphicJFrame extends JFrame {
 		getContentPane().remove(samplingRateLabel);
 		getContentPane().remove(totalSamplesLabel);
 		getContentPane().remove(legend);
+		getContentPane().remove(CompressionRatioSound);
 		getContentPane().remove(audioPanel);
 	}
 
@@ -128,8 +130,8 @@ public class GraphicJFrame extends JFrame {
 		getContentPane().add(imageFileLabel);
 		getContentPane().add(selectImageFileButton);
 		getContentPane().add(imagePanel);
-		getContentPane().add(ditherButton);
-		ditherButton.setEnabled(false);
+		// getContentPane().add(ditherButton);
+		// ditherButton.setEnabled(false);
 		getContentPane().add(ExitButton);
 	}
 
@@ -137,13 +139,13 @@ public class GraphicJFrame extends JFrame {
 		getContentPane().remove(imageFileLabel);
 		getContentPane().remove(selectImageFileButton);
 		getContentPane().remove(imagePanel);
-		getContentPane().remove(ditherButton);
-		ditherButton.setEnabled(false);
+		// getContentPane().remove(ditherButton);
+		// ditherButton.setEnabled(false);
 	}
 
-	public static void ditherButtonClicked(ActionEvent e) {
-		imagePanel.toggleDither();
-	}
+	// public static void ditherButtonClicked(ActionEvent e) {
+	// 	imagePanel.toggleDither();
+	// }
 
 	public static void readWav(File f) {
 		try {
@@ -225,6 +227,11 @@ public class GraphicJFrame extends JFrame {
 			File file = fileChooser.getSelectedFile();
 			fileLabel.setText("File Selected: " + fileChooser.getSelectedFile().getName());
 			readWav(file);
+			
+			if (SoundPanel.CompressionRatio != 0) {
+				String ratio = String.format("Compression Ratio: %.2f", SoundPanel.CompressionRatio);
+				CompressionRatioSound.setText(ratio);
+			}
 		}
 
 	}
@@ -240,7 +247,7 @@ public class GraphicJFrame extends JFrame {
 		if (res == JFileChooser.APPROVE_OPTION) {
 			File file = fileChooser.getSelectedFile();
 			imageFileLabel.setText("File Selected: " + fileChooser.getSelectedFile().getName());
-			ditherButton.setEnabled(true);
+			// ditherButton.setEnabled(true);
 			readPNG(file);
 			pack();
 		}
