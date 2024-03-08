@@ -32,6 +32,17 @@ This Java application provides functionality to analyze and compress both sound 
 6. Exit the application when done.
 
 
+## Compression Method
+
+The Media Compression Project utilizes a combination of techniques for compressing both sound and image files:
+
+- **Image Compression**: The project employs Discrete Cosine Transform (DCT) for transforming image data from the spatial domain to the frequency domain. Following the transformation, quantization is applied to reduce the precision of the transformed coefficients. The quantized coefficients are then entropy encoded using Huffman coding to achieve lossy compression. The process involves run-length encoding of zigzag-ordered DCT coefficients followed by Huffman encoding, resulting in efficient compression.
+
+- **Sound Compression**: For sound files, the project employs similar techniques. Discrete Cosine Transform (DCT) is applied to transform sound data, followed by quantization and entropy encoding using Huffman coding. The process reduces the precision of the transformed coefficients and encodes them efficiently to achieve compression while maintaining perceptual audio quality.
+
+These compression methods aim to reduce file size while preserving essential characteristics of the media, ensuring efficient storage and transmission of sound and image data.
+
+
 ## Example
 
 ### Sound Compression
