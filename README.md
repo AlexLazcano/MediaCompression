@@ -1,4 +1,4 @@
-# title: Project 2 - CMPT 365
+# Media Compression Project - CMPT 365
 
 
 This Java application provides functionality to analyze and compress both sound and image files. It features a graphical user interface (GUI) built with Swing.
