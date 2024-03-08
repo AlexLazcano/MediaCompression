@@ -36,8 +36,8 @@ This Java application provides functionality to analyze and compress both sound 
 
 ### Sound Compression
 
-![Sound Compression Example](example/sound-compression.png)
+![Sound Compression Example](SampleInputsProject1/example/sound-compression.png)
 
 ### Image Compression
 
-![Image Compression Example](example/image-compression.png)
+![Image Compression Example](SampleInputsProject1/example/image-compression.png)
