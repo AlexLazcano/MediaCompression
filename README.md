@@ -30,3 +30,14 @@ This Java application provides functionality to analyze and compress both sound 
 4. View the analysis results and compression ratios.
 5. Optionally, apply compression to the file.
 6. Exit the application when done.
+
+
+## Example
+
+### Sound Compression
+
+![Sound Compression Example](example/sound-compression.png)
+
+### Image Compression
+
+![Image Compression Example](example/image-compression.png)
