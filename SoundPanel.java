@@ -5,7 +5,6 @@ import java.awt.*;
 import java.io.FileWriter;
 import java.util.PriorityQueue;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 class HuffmanNode {
@@ -36,6 +35,8 @@ public class SoundPanel extends JPanel {
 	private static int bitsPerSample;
 	private static int numberOfFrames;
 	public static double CompressionRatio;
+	public static int BeforeCompression;
+	public static int AfterCompression;
 
 	public static void printCode(HuffmanNode root, String s) {
 		if (root.left == null && root.right == null && Integer.valueOf(root.c) != null) {
@@ -161,6 +162,8 @@ public class SoundPanel extends JPanel {
 
 		System.out.println("Number of bits before encoded: " + numberOfBits);
 		System.out.println("Number of bits encoded: " + numberOfBitsEncoded);
+		BeforeCompression = numberOfBits;
+		AfterCompression = numberOfBitsEncoded;
 		double compressionRatio = (double) numberOfBits / (double) numberOfBitsEncoded;
 		CompressionRatio = compressionRatio;
 		System.out.println("Compression ratio: " + compressionRatio);
@@ -172,21 +175,6 @@ public class SoundPanel extends JPanel {
 		}
 		System.out.println();
 		System.out.println();
-	}
-
-	// remove duplicates from integer array
-	public static int[] removeDuplicates(int[] intArray) {
-		HashSet<Integer> set = new HashSet<Integer>();
-		for (int i = 0; i < intArray.length; i++) {
-			set.add(intArray[i]);
-		}
-		int[] newArray = new int[set.size()];
-		int i = 0;
-		for (int num : set) {
-			newArray[i] = num;
-			i++;
-		}
-		return newArray;
 	}
 
 	// signed to unsigned
@@ -245,21 +233,18 @@ public class SoundPanel extends JPanel {
 		try {
 			FileWriter w = new FileWriter("compressedSoundFile.txt");
 			for (int i = 0; i < info.length; i++) {
-				w.write(info[i]+ " ");
+				w.write(info[i] + " ");
 			}
 			w.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 
 		for (int i = 0; i < stream.length; i++) {
 			length += huffmanCodes.get(stream[i]).length();
-			// output = output + huffmanCodes.get(stream[i]) + " ";
+
 		}
 
-		// System.out.println("Length of output: " + length);
-		// System.out.println("done encoding");
 		return length;
 	}
 }

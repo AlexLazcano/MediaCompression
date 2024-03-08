@@ -22,11 +22,15 @@ public class GraphicJFrame extends JFrame {
 	private static JLabel totalSamplesLabel = new JLabel("Total Samples: ");
 	private static JLabel legend = new JLabel("Left - Green | Right - Red | Mono - Black");
 	private static JLabel CompressionRatioSound = new JLabel("Compression Ratio: ");
+	private static JLabel beforeCompressionSound = new JLabel("Before Compression: ");
+	private static JLabel afterCompressionSound = new JLabel("After Compression: ");
 	// image
 	private static ImagePanel imagePanel = new ImagePanel();
 	private static JLabel imageFileLabel = new JLabel("No File Selected");
 	private static JButton selectImageFileButton = new JButton("Select file");
 	private static JLabel CompressionRatioImage = new JLabel("Compression Ratio: ");
+	private static JLabel beforeCompressionImage = new JLabel("Before Compression: ");
+	private static JLabel afterCompressionImage = new JLabel("After Compression: ");
 
 	private static JButton ImageButton = new JButton("Image");
 	private static JButton SoundButton = new JButton("Sound");
@@ -38,7 +42,7 @@ public class GraphicJFrame extends JFrame {
 	public GraphicJFrame() {
 
 		setSize(500, 500);
-		setTitle("Project 1 - CMPT 365");
+		setTitle("Project 2 - CMPT 365");
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -104,6 +108,8 @@ public class GraphicJFrame extends JFrame {
 		getContentPane().add(samplingRateLabel);
 		getContentPane().add(totalSamplesLabel);
 		getContentPane().add(legend);
+		getContentPane().add(beforeCompressionSound);
+		getContentPane().add(afterCompressionSound);
 		getContentPane().add(CompressionRatioSound);
 		getContentPane().add(audioPanel);
 		getContentPane().add(ExitButton);
@@ -116,6 +122,8 @@ public class GraphicJFrame extends JFrame {
 		getContentPane().remove(samplingRateLabel);
 		getContentPane().remove(totalSamplesLabel);
 		getContentPane().remove(legend);
+		getContentPane().remove(beforeCompressionSound);
+		getContentPane().remove(afterCompressionSound);
 		getContentPane().remove(CompressionRatioSound);
 		getContentPane().remove(audioPanel);
 	}
@@ -124,6 +132,8 @@ public class GraphicJFrame extends JFrame {
 
 		getContentPane().add(imageFileLabel);
 		getContentPane().add(selectImageFileButton);
+		getContentPane().add(beforeCompressionImage);
+		getContentPane().add(afterCompressionImage);
 		getContentPane().add(CompressionRatioImage);
 		getContentPane().add(imagePanel);
 		getContentPane().add(ExitButton);
@@ -132,6 +142,8 @@ public class GraphicJFrame extends JFrame {
 	public void removeImage() {
 		getContentPane().remove(imageFileLabel);
 		getContentPane().remove(selectImageFileButton);
+		getContentPane().remove(beforeCompressionImage);
+		getContentPane().remove(afterCompressionImage);
 		getContentPane().remove(CompressionRatioImage);
 		getContentPane().remove(imagePanel);
 	}
@@ -219,6 +231,10 @@ public class GraphicJFrame extends JFrame {
 
 			if (SoundPanel.CompressionRatio != 0) {
 				String ratio = String.format("Compression Ratio: %.2f", SoundPanel.CompressionRatio);
+				String before = String.format("Before Compression (bits): %d", SoundPanel.BeforeCompression);
+				String after = String.format("After Compression (bits): %d", SoundPanel.AfterCompression);
+				beforeCompressionSound.setText(before);
+				afterCompressionSound.setText(after);
 				CompressionRatioSound.setText(ratio);
 			}
 		}
@@ -239,6 +255,10 @@ public class GraphicJFrame extends JFrame {
 			readPNG(file);
 			if (ImagePanel.CompressionRatio != 0) {
 				String ratio = String.format("Compression Ratio: %.2f", ImagePanel.CompressionRatio);
+				String before = String.format("Before Compression (Bits): %d", ImagePanel.BeforeCompressionSize);
+				String after = String.format("After Compression (Bits): %d", ImagePanel.AfterCompressionSize);
+				beforeCompressionImage.setText(before);
+				afterCompressionImage.setText(after);
 				CompressionRatioImage.setText(ratio);
 
 			}

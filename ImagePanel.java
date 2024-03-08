@@ -9,7 +9,6 @@ import java.lang.Math;
 import java.io.FileWriter;
 import java.util.PriorityQueue;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 class HuffmanNode {
@@ -33,6 +32,8 @@ public class ImagePanel extends JPanel {
     private static BufferedImage compressed = null;
     private static boolean isDithered = false;
     public static double CompressionRatio;
+    public static int BeforeCompressionSize;
+    public static int AfterCompressionSize;
     static LinkedHashMap<Integer, Integer> huffmanCodesBinary = new LinkedHashMap<Integer, Integer>();
 
     // final private static int[][] quantizationTable = {
@@ -235,20 +236,10 @@ public class ImagePanel extends JPanel {
 
         int totalBitsAfter = encodeHuffman(intArray, freq, stream);
 
-        // try {
-        //     FileWriter writer = new FileWriter("compressedImage.txt");
-        //     writer.write(compressedString);
-        //     // for (int i = 0; i < compressedBytes.length; i++) {
-        //     // writer.write(compressedBytes[i] + " ");
-        //     // }
-
-        //     writer.close();
-        // } catch (Exception e) {
-        //     System.out.println("Error writing to file");
-        // }
-
         double compressionRatio = (double) totalBitsBefore / totalBitsAfter;
         CompressionRatio = compressionRatio;
+        BeforeCompressionSize = totalBitsBefore;
+        AfterCompressionSize = totalBitsAfter;
         System.out.println("Total bits before: " + totalBitsBefore);
         System.out.println("Total bits after: " + totalBitsAfter);
         System.out.println("Compression ratio: " + compressionRatio);
